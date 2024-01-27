@@ -67,12 +67,13 @@
     cryptsetup
     curl
     wget
-    wormhole-william
+    magic-wormhole
   ];
 
   # save space and compilation time. might revise?
-  hardware.enableAllFirmware = lib.mkForce false;
-  hardware.enableRedistributableFirmware = lib.mkForce false;
+  hardware.enableAllFirmware = lib.mkForce true;
+  hardware.enableRedistributableFirmware = lib.mkForce true;
+  nixpkgs.config.allowUnfree = true;
   sound.enable = false;
   # avoid including non-reproducible dbus docs
   documentation.doc.enable = false;
