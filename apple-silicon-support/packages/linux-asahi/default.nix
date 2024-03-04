@@ -5,7 +5,7 @@
 , writeText
 , removeReferencesTo
 , linuxPackagesFor
-, withRust ? false
+, withRust ? true
 , _kernelPatches ? [ ]
 }:
 
