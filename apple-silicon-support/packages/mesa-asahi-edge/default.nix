@@ -1,6 +1,7 @@
 { lib
 , fetchFromGitLab
 , mesa
+, meson
 , llvmPackages
 }:
 
@@ -19,8 +20,8 @@
     domain = "gitlab.freedesktop.org";
     owner = "asahi";
     repo = "mesa";
-    rev = "asahi-20240218";
-    hash = "sha256-IMR6x7xYUOp/IBycL8RKs4lbInEh2Xfu6Kjom4S+D/s=";
+    rev = "asahi-20240228";
+    hash = "sha256-wOFJyYfoN6yxE9HaHXLP/0MhjyRvmlb+jPPUke0sbbE=";
   };
 
   mesonFlags =
@@ -36,7 +37,9 @@
       # do not want to add the dependencies
       "-Dlibunwind=disabled"
       "-Dlmsensors=disabled"
-    ];
+    ] ++ ( # does not compile on nixpkgs stable, doesn't seem mandatory
+      lib.optional (lib.versionOlder meson.version "1.3.1")
+        "-Dgallium-rusticl=false");
 
   # replace patches with ones tweaked slightly to apply to this version
   patches = [
