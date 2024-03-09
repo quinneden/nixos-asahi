@@ -13,9 +13,6 @@
   withValgrind = false;
   enableGalliumNine = false;
   enablePatentEncumberedCodecs = false;
-  # Given that Hector and Lina explicitly do not support X11 anymore,
-  # and that the "edge" configuration was removed from Fedora and this NixOS,
-  # remove the X11 driver from Mesa
   eglPlatforms = [ "x11" "wayland" ];
   # libclc and other OpenCL components are needed for geometry shader support on Apple Silicon
   enableOpenCL = true;
