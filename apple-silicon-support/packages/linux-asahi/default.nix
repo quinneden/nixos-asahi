@@ -146,7 +146,11 @@ let
         fi
         remove-references-to -t $dev $out/Image
       '';
+      NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -march=armv8.5-a+fp16+fp16fml+aes+sha2+sha3+nosve+nosve2+nomemtag+norng+nosm4+nof32mm+nof64mm";
       RUST_LIB_SRC = rustPlatform.rustLibSrc;
+
+      hardeningEnable = [ "pic" "format" "fortify" "stackprotector" ];
+      hardeningDisable = [ "bindnow" "pie" "relro" ];
     } else {});
 
   linux-asahi = (callPackage linux-asahi-pkg { });
