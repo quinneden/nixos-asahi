@@ -27,34 +27,23 @@
     boot.initrd.availableKernelModules = [
       # list of initrd modules stolen from
       # https://github.com/AsahiLinux/asahi-scripts/blob/f461f080a1d2575ae4b82879b5624360db3cff8c/initcpio/install/asahi
-      "apple-mailbox"
-      "nvme_apple"
-      "pinctrl-apple-gpio"
-      "macsmc"
-      "macsmc-rtkit"
-      "i2c-pasemi-platform"
       "tps6598x"
-      "apple-dart"
       "dwc3"
+      "dwc3-haps"
       "dwc3-of-simple"
       "xhci-pci"
-      "pcie-apple"
-      "gpio_macsmc"
       "phy-apple-atc"
-      "nvmem_apple_efuses"
-      "spi-apple"
-      "spi-hid-apple"
-      "spi-hid-apple-of"
-      "rtc-macsmc"
-      "simple-mfd-spmi"
-      "spmi-apple-controller"
-      "nvmem_spmi_mfd"
-      "apple-dockchannel"
+      "phy-apple-dptx"
       "dockchannel-hid"
-      "apple-rtkit-helper"
+      "mux-apple-display-crossbar"
+      "apple-dcp"
+      "apple-z2"
 
       # additional stuff necessary to boot off USB for the installer
       # and if the initrd (i.e. stage 1) goes wrong
+      "uas"
+      "udc_core"
+      "xhci-hcd"
       "usb-storage"
       "xhci-plat-hcd"
       "usbhid"
@@ -62,7 +51,6 @@
     ];
 
     boot.kernelParams = [
-      "earlycon"
       "console=ttySAC0,115200n8"
       "console=tty0"
       "boot.shell_on_fail"
@@ -106,7 +94,7 @@
 
   options.hardware.asahi.withRust = lib.mkOption {
     type = lib.types.bool;
-    default = false;
+    default = true;
     description = ''
       Build the Asahi Linux kernel with Rust support.
     '';
