@@ -10,7 +10,7 @@
     owner = "jannau";
     repo = "u-boot-1";
     rev = "asahi-v2024.04-1";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    hash = "sha256-/cpdNLO83pW9uOKFJgGQdSzNUQuE2x5oLVFeoElcTbs=";
   };
   version = "2024.04-1-asahi";
 

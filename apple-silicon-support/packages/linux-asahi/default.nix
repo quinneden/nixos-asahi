@@ -94,8 +94,8 @@ let
         # tracking: https://github.com/AsahiLinux/linux/tree/asahi-wip (w/ fedora verification)
         owner = "AsahiLinux";
         repo = "linux";
-        rev = "f74bb9380ecdc5e54ddaa93d75addc9dfe0c66f6";
-        hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        rev = "asahi-6.8.9-3";
+        hash = "sha256-FEOMKdJQWAbL4SAY0NWKmN1zPE4cV912pcnvTKS8zBc=";
       };
 
       kernelPatches = [
@@ -136,4 +136,3 @@ let
 
   linux-asahi = (callPackage linux-asahi-pkg { });
 in lib.recurseIntoAttrs (linuxPackagesFor linux-asahi)
-

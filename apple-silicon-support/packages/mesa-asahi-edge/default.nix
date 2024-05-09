@@ -74,11 +74,6 @@
       # save time, don't build tests
       "-Dbuild-tests=false"
       "-Denable-glcpp-tests=false"
-      # the upstream nixpkgs code for detecting whether we want intel-clc
-      # is deeply flawed and is likely causing subtle build differences
-      # between cross-compiles and non-cross-compiles.
-      # disable it using the same lib.mesonEnable-type call that nixpkgs uses
-      (lib.mesonEnable "intel-clc" false)
     ];
 
   # replace patches with ones tweaked slightly to apply to this version
