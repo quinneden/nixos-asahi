@@ -23,10 +23,10 @@
   src = lib.cleanSource (fetchFromGitLab {
     # tracking: https://pagure.io/fedora-asahi/mesa/commits/asahi
     domain = "gitlab.freedesktop.org";
-    owner = "asahi";
+    owner = "asahilina";
     repo = "mesa";
-    rev = "asahi-20240228";
-    hash = "sha256-wOFJyYfoN6yxE9HaHXLP/0MhjyRvmlb+jPPUke0sbbE=";
+    rev = "a4bc3e731a01771b1ac24515bdc482c9a8d18b87";
+    hash = "sha256-IVNW9uR2KC/eXdkbMswN3ePSkwkksAQd6R+ldHkhp70=";
   });
 
   mesonFlags =
@@ -74,6 +74,8 @@
       # save time, don't build tests
       "-Dbuild-tests=false"
       "-Denable-glcpp-tests=false"
+      # fix error seen in very recent nixpkgs
+      "-Dintel-rt=false"
     ];
 
   # replace patches with ones tweaked slightly to apply to this version
