@@ -94,8 +94,8 @@ let
         # tracking: https://github.com/AsahiLinux/linux/tree/asahi-wip (w/ fedora verification)
         owner = "AsahiLinux";
         repo = "linux";
-        rev = "asahi-6.8.9-3";
-        hash = "sha256-FEOMKdJQWAbL4SAY0NWKmN1zPE4cV912pcnvTKS8zBc=";
+        rev = "asahi-6.8.9-4";
+        hash = "sha256-CJa+v2L3/OW1vFNcVsnMN0J+GkjrSeyqjEgTfr+FzaQ=";
       };
 
       kernelPatches = [
