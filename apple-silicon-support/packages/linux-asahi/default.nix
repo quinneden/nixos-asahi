@@ -116,6 +116,22 @@ let
             hash = "sha256-wn5x2hN42/kCp/XHBvLWeNLfwlOBB+T6UeeMt2tSg3o=";
           };
         }
+        {
+          name = "revert-1";
+          patch = fetchpatch {
+            url = "https://github.com/torvalds/linux/commit/2632e2521769.patch";
+            hash = "sha256-80g7yn04WLCesEBlICqY57l4Murvon+T34Yeo2GFRgE=";
+            revert = true;
+          };
+        }
+        {
+          name = "revert-2";
+          patch = fetchpatch {
+            url = "https://github.com/torvalds/linux/commit/aefbab8e77eb.patch";
+            hash = "sha256-kRLgjOeYIXGhvxGBU2D1hUO/QPN6BtXlWXJzMPp2K7c=";
+            revert = true;
+          };
+        }
         { name = "pci-quirks";
           patch = ./pci-quirks.patch;
         }
