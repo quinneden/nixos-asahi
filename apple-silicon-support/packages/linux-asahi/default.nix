@@ -86,7 +86,7 @@ let
     (linuxKernel.manualConfig rec {
       inherit stdenv lib;
 
-      version = "6.8.9-asahi";
+      version = "6.8.11-asahi";
       modDirVersion = version;
       extraMeta.branch = "6.8";
 
@@ -94,8 +94,8 @@ let
         # tracking: https://github.com/AsahiLinux/linux/tree/asahi-wip (w/ fedora verification)
         owner = "AsahiLinux";
         repo = "linux";
-        rev = "asahi-6.8.9-5";
-        hash = "sha256-JzUKJVVQDrlqZ9ihLdSOQtCxm4vlzH7/P7gfcRCjUK8=";
+        rev = "asahi-6.8.11-1";
+        hash = "sha256-Uph3fcSHSXUULlsb9HxetXgBeBR1N1EQdjhDyvPApbA=";
       };
 
       kernelPatches = [
@@ -114,22 +114,6 @@ let
           patch = fetchpatch {
             url = "https://github.com/AsahiLinux/linux/commit/6a24102c06c95951ab992e2d41336cc6d4bfdf23.patch";
             hash = "sha256-wn5x2hN42/kCp/XHBvLWeNLfwlOBB+T6UeeMt2tSg3o=";
-          };
-        }
-        {
-          name = "revert-1";
-          patch = fetchpatch {
-            url = "https://github.com/torvalds/linux/commit/2632e2521769.patch";
-            hash = "sha256-80g7yn04WLCesEBlICqY57l4Murvon+T34Yeo2GFRgE=";
-            revert = true;
-          };
-        }
-        {
-          name = "revert-2";
-          patch = fetchpatch {
-            url = "https://github.com/torvalds/linux/commit/aefbab8e77eb.patch";
-            hash = "sha256-kRLgjOeYIXGhvxGBU2D1hUO/QPN6BtXlWXJzMPp2K7c=";
-            revert = true;
           };
         }
         { name = "pci-quirks";
