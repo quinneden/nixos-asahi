@@ -95,7 +95,7 @@ let
         owner = "AsahiLinux";
         repo = "linux";
         rev = "asahi-6.8.10-4";
-        hash = "sha256-/UknEMf4awGcb1Pf2YiCfowPV/oIx0zAGNJm0wp1qgA=";
+        hash = "sha256-/UknEMf4awGcb1Pf2YiCfowPv/oIx0zAGNJm0wp1qgA=";
       };
 
       kernelPatches = [
