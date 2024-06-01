@@ -61,7 +61,7 @@
       # is 1000) has the potential, though admittedly unlikely, risk of
       # UNBOUNDED data corruption in case of power loss!!!! Don't even think
       # about it on desktops!!
-      "nvme_apple.flush_interval=0"
+      "nvme_apple.flush_interval=1000"
     ];
 
     # U-Boot does not support EFI variables
