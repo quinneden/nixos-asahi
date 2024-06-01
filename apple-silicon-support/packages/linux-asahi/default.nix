@@ -116,6 +116,9 @@ let
             hash = "sha256-wn5x2hN42/kCp/XHBvLWeNLfwlOBB+T6UeeMt2tSg3o=";
           };
         }
+        { name = "pci-quirks";
+          patch = ./pci-quirks.patch;
+        }
       ] ++ _kernelPatches;
 
       inherit configfile;
