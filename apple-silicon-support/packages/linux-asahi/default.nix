@@ -119,6 +119,12 @@ let
         { name = "pci-quirks";
           patch = ./pci-quirks.patch;
         }
+        { name = "more-quirks";
+          patch = ./more-quirks.patch;
+        }
+        { name = "even-more-quirks";
+          patch = ./even-more-quirks.patch;
+        }
       ] ++ _kernelPatches;
 
       inherit configfile;

@@ -1,0 +1,519 @@
+diff -Naur a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+--- a/drivers/ata/libata-core.c	2024-05-12 05:44:02.000000000 -0400
++++ b/drivers/ata/libata-core.c	2024-05-28 16:57:56.691802397 -0400
+@@ -4039,44 +4039,12 @@
+ 
+ static const struct ata_blacklist_entry ata_device_blacklist [] = {
+ 	/* Devices with DMA related problems under Linux */
+-	{ "WDC AC11000H",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "WDC AC22100H",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "WDC AC32500H",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "WDC AC33100H",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "WDC AC31600H",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "WDC AC32100H",	"24.09P07",	ATA_HORKAGE_NODMA },
+-	{ "WDC AC23200L",	"21.10N21",	ATA_HORKAGE_NODMA },
+-	{ "Compaq CRD-8241B", 	NULL,		ATA_HORKAGE_NODMA },
+-	{ "CRD-8400B",		NULL, 		ATA_HORKAGE_NODMA },
+-	{ "CRD-848[02]B",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "CRD-84",		NULL,		ATA_HORKAGE_NODMA },
+-	{ "SanDisk SDP3B",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "SanDisk SDP3B-64",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "SANYO CD-ROM CRD",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "HITACHI CDR-8",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "HITACHI CDR-8[34]35",NULL,		ATA_HORKAGE_NODMA },
+-	{ "Toshiba CD-ROM XM-6202B", NULL,	ATA_HORKAGE_NODMA },
+-	{ "TOSHIBA CD-ROM XM-1702BC", NULL,	ATA_HORKAGE_NODMA },
+-	{ "CD-532E-A", 		NULL,		ATA_HORKAGE_NODMA },
+-	{ "E-IDE CD-ROM CR-840",NULL,		ATA_HORKAGE_NODMA },
+-	{ "CD-ROM Drive/F5A",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "WPI CDD-820", 	NULL,		ATA_HORKAGE_NODMA },
+-	{ "SAMSUNG CD-ROM SC-148C", NULL,	ATA_HORKAGE_NODMA },
+-	{ "SAMSUNG CD-ROM SC",	NULL,		ATA_HORKAGE_NODMA },
+-	{ "ATAPI CD-ROM DRIVE 40X MAXIMUM",NULL,ATA_HORKAGE_NODMA },
+-	{ "_NEC DV5800A", 	NULL,		ATA_HORKAGE_NODMA },
+-	{ "SAMSUNG CD-ROM SN-124", "N001",	ATA_HORKAGE_NODMA },
+-	{ "Seagate STT20000A", NULL,		ATA_HORKAGE_NODMA },
+ 	{ " 2GB ATA Flash Disk", "ADMA428M",	ATA_HORKAGE_NODMA },
+ 	{ "VRFDFC22048UCHC-TE*", NULL,		ATA_HORKAGE_NODMA },
+-	/* Odd clown on sil3726/4726 PMPs */
+-	{ "Config  Disk",	NULL,		ATA_HORKAGE_DISABLE },
+ 	/* Similar story with ASMedia 1092 */
+ 	{ "ASMT109x- Config",	NULL,		ATA_HORKAGE_DISABLE },
+ 
+ 	/* Weird ATAPI devices */
+-	{ "TORiSAN DVD-ROM DRD-N216", NULL,	ATA_HORKAGE_MAX_SEC_128 },
+-	{ "QUANTUM DAT    DAT72-000", NULL,	ATA_HORKAGE_ATAPI_MOD16_DMA },
+ 	{ "Slimtype DVD A  DS8A8SH", NULL,	ATA_HORKAGE_MAX_SEC_LBA48 },
+ 	{ "Slimtype DVD A  DS8A9SH", NULL,	ATA_HORKAGE_MAX_SEC_LBA48 },
+ 
+@@ -4093,33 +4061,6 @@
+ 	{ "LITEON CX1-JB*-HP",	NULL,		ATA_HORKAGE_MAX_SEC_1024 },
+ 	{ "LITEON EP1-*",	NULL,		ATA_HORKAGE_MAX_SEC_1024 },
+ 
+-	/* Devices we expect to fail diagnostics */
+-
+-	/* Devices where NCQ should be avoided */
+-	/* NCQ is slow */
+-	{ "WDC WD740ADFD-00",	NULL,		ATA_HORKAGE_NONCQ },
+-	{ "WDC WD740ADFD-00NLR1", NULL,		ATA_HORKAGE_NONCQ },
+-	/* http://thread.gmane.org/gmane.linux.ide/14907 */
+-	{ "FUJITSU MHT2060BH",	NULL,		ATA_HORKAGE_NONCQ },
+-	/* NCQ is broken */
+-	{ "Maxtor *",		"BANC*",	ATA_HORKAGE_NONCQ },
+-	{ "Maxtor 7V300F0",	"VA111630",	ATA_HORKAGE_NONCQ },
+-	{ "ST380817AS",		"3.42",		ATA_HORKAGE_NONCQ },
+-	{ "ST3160023AS",	"3.42",		ATA_HORKAGE_NONCQ },
+-	{ "OCZ CORE_SSD",	"02.10104",	ATA_HORKAGE_NONCQ },
+-
+-	/* Seagate NCQ + FLUSH CACHE firmware bug */
+-	{ "ST31500341AS",	"SD1[5-9]",	ATA_HORKAGE_NONCQ |
+-						ATA_HORKAGE_FIRMWARE_WARN },
+-
+-	{ "ST31000333AS",	"SD1[5-9]",	ATA_HORKAGE_NONCQ |
+-						ATA_HORKAGE_FIRMWARE_WARN },
+-
+-	{ "ST3640[36]23AS",	"SD1[5-9]",	ATA_HORKAGE_NONCQ |
+-						ATA_HORKAGE_FIRMWARE_WARN },
+-
+-	{ "ST3320[68]13AS",	"SD1[5-9]",	ATA_HORKAGE_NONCQ |
+-						ATA_HORKAGE_FIRMWARE_WARN },
+ 
+ 	/* drives which fail FPDMA_AA activation (some may freeze afterwards)
+ 	   the ST disks also have LPM issues */
+@@ -4127,45 +4068,17 @@
+ 						ATA_HORKAGE_NOLPM },
+ 	{ "VB0250EAVER",	"HPG7",		ATA_HORKAGE_BROKEN_FPDMA_AA },
+ 
+-	/* Blacklist entries taken from Silicon Image 3124/3132
+-	   Windows driver .inf file - also several Linux problem reports */
+-	{ "HTS541060G9SA00",    "MB3OC60D",     ATA_HORKAGE_NONCQ },
+-	{ "HTS541080G9SA00",    "MB4OC60D",     ATA_HORKAGE_NONCQ },
+-	{ "HTS541010G9SA00",    "MBZOC60D",     ATA_HORKAGE_NONCQ },
+-
+-	/* https://bugzilla.kernel.org/show_bug.cgi?id=15573 */
+-	{ "C300-CTFDDAC128MAG",	"0001",		ATA_HORKAGE_NONCQ },
+ 
+ 	/* Sandisk SD7/8/9s lock up hard on large trims */
+ 	{ "SanDisk SD[789]*",	NULL,		ATA_HORKAGE_MAX_TRIM_128M },
+ 
+-	/* devices which puke on READ_NATIVE_MAX */
+-	{ "HDS724040KLSA80",	"KFAOA20N",	ATA_HORKAGE_BROKEN_HPA },
+-	{ "WDC WD3200JD-00KLB0", "WD-WCAMR1130137", ATA_HORKAGE_BROKEN_HPA },
+-	{ "WDC WD2500JD-00HBB0", "WD-WMAL71490727", ATA_HORKAGE_BROKEN_HPA },
+-	{ "MAXTOR 6L080L4",	"A93.0500",	ATA_HORKAGE_BROKEN_HPA },
+-
+-	/* this one allows HPA unlocking but fails IOs on the area */
+-	{ "OCZ-VERTEX",		    "1.30",	ATA_HORKAGE_BROKEN_HPA },
+-
+-	/* Devices which report 1 sector over size HPA */
+-	{ "ST340823A",		NULL,		ATA_HORKAGE_HPA_SIZE },
+-	{ "ST320413A",		NULL,		ATA_HORKAGE_HPA_SIZE },
+-	{ "ST310211A",		NULL,		ATA_HORKAGE_HPA_SIZE },
+ 
+-	/* Devices which get the IVB wrong */
+-	{ "QUANTUM FIREBALLlct10 05", "A03.0900", ATA_HORKAGE_IVB },
+ 	/* Maybe we should just blacklist TSSTcorp... */
+ 	{ "TSSTcorp CDDVDW SH-S202[HJN]", "SB0[01]",  ATA_HORKAGE_IVB },
+ 
+ 	/* Devices that do not need bridging limits applied */
+-	{ "MTRON MSP-SATA*",		NULL,	ATA_HORKAGE_BRIDGE_OK },
+ 	{ "BUFFALO HD-QSU2/R5",		NULL,	ATA_HORKAGE_BRIDGE_OK },
+ 
+-	/* Devices which aren't very happy with higher link speeds */
+-	{ "WD My Book",			NULL,	ATA_HORKAGE_1_5_GBPS },
+-	{ "Seagate FreeAgent GoFlex",	NULL,	ATA_HORKAGE_1_5_GBPS },
+-
+ 	/*
+ 	 * Devices which choke on SETXFER.  Applies only if both the
+ 	 * device and controller are SATA.
+diff -Naur a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+--- a/drivers/bluetooth/hci_bcm.c	2024-05-12 05:44:02.000000000 -0400
++++ b/drivers/bluetooth/hci_bcm.c	2024-05-21 21:21:16.038148400 -0400
+@@ -1329,149 +1329,11 @@
+ };
+ 
+ static const struct acpi_device_id bcm_acpi_match[] = {
+-	{ "BCM2E00" },
+-	{ "BCM2E01" },
+-	{ "BCM2E02" },
+-	{ "BCM2E03" },
+-	{ "BCM2E04" },
+-	{ "BCM2E05" },
+-	{ "BCM2E06" },
+-	{ "BCM2E07" },
+-	{ "BCM2E08" },
+-	{ "BCM2E09" },
+-	{ "BCM2E0A" },
+-	{ "BCM2E0B" },
+-	{ "BCM2E0C" },
+-	{ "BCM2E0D" },
+-	{ "BCM2E0E" },
+-	{ "BCM2E0F" },
+-	{ "BCM2E10" },
+-	{ "BCM2E11" },
+-	{ "BCM2E12" },
+-	{ "BCM2E13" },
+-	{ "BCM2E14" },
+-	{ "BCM2E15" },
+-	{ "BCM2E16" },
+-	{ "BCM2E17" },
+-	{ "BCM2E18" },
+-	{ "BCM2E19" },
+-	{ "BCM2E1A" },
+-	{ "BCM2E1B" },
+-	{ "BCM2E1C" },
+-	{ "BCM2E1D" },
+-	{ "BCM2E1F" },
+-	{ "BCM2E20" },
+-	{ "BCM2E21" },
+-	{ "BCM2E22" },
+-	{ "BCM2E23" },
+-	{ "BCM2E24" },
+-	{ "BCM2E25" },
+-	{ "BCM2E26" },
+-	{ "BCM2E27" },
+-	{ "BCM2E28" },
+-	{ "BCM2E29" },
+-	{ "BCM2E2A" },
+-	{ "BCM2E2B" },
+-	{ "BCM2E2C" },
+-	{ "BCM2E2D" },
+-	{ "BCM2E2E" },
+-	{ "BCM2E2F" },
+-	{ "BCM2E30" },
+-	{ "BCM2E31" },
+-	{ "BCM2E32" },
+-	{ "BCM2E33" },
+-	{ "BCM2E34" },
+-	{ "BCM2E35" },
+-	{ "BCM2E36" },
+-	{ "BCM2E37" },
+-	{ "BCM2E38" },
+-	{ "BCM2E39" },
+-	{ "BCM2E3A" },
+-	{ "BCM2E3B" },
+-	{ "BCM2E3C" },
+-	{ "BCM2E3D" },
+-	{ "BCM2E3E" },
+-	{ "BCM2E3F" },
+-	{ "BCM2E40" },
+-	{ "BCM2E41" },
+-	{ "BCM2E42" },
+-	{ "BCM2E43" },
+-	{ "BCM2E44" },
+-	{ "BCM2E45" },
+-	{ "BCM2E46" },
+-	{ "BCM2E47" },
+-	{ "BCM2E48" },
+-	{ "BCM2E49" },
+-	{ "BCM2E4A" },
+-	{ "BCM2E4B" },
+-	{ "BCM2E4C" },
+-	{ "BCM2E4D" },
+-	{ "BCM2E4E" },
+-	{ "BCM2E4F" },
+-	{ "BCM2E50" },
+-	{ "BCM2E51" },
+-	{ "BCM2E52" },
+-	{ "BCM2E53" },
+-	{ "BCM2E54" },
+-	{ "BCM2E55" },
+-	{ "BCM2E56" },
+-	{ "BCM2E57" },
+-	{ "BCM2E58" },
+-	{ "BCM2E59" },
+-	{ "BCM2E5A" },
+-	{ "BCM2E5B" },
+-	{ "BCM2E5C" },
+-	{ "BCM2E5D" },
+-	{ "BCM2E5E" },
+-	{ "BCM2E5F" },
+-	{ "BCM2E60" },
+-	{ "BCM2E61" },
+-	{ "BCM2E62" },
+-	{ "BCM2E63" },
+-	{ "BCM2E64" },
+-	{ "BCM2E65" },
+-	{ "BCM2E66" },
+-	{ "BCM2E67" },
+-	{ "BCM2E68" },
+-	{ "BCM2E69" },
+-	{ "BCM2E6B" },
+-	{ "BCM2E6D" },
+-	{ "BCM2E6E" },
+-	{ "BCM2E6F" },
+-	{ "BCM2E70" },
+-	{ "BCM2E71" },
+-	{ "BCM2E72" },
+-	{ "BCM2E73" },
+ 	{ "BCM2E74", (long)&bcm43430_device_data },
+ 	{ "BCM2E75", (long)&bcm43430_device_data },
+-	{ "BCM2E76" },
+-	{ "BCM2E77" },
+-	{ "BCM2E78" },
+-	{ "BCM2E79" },
+-	{ "BCM2E7A" },
+ 	{ "BCM2E7B", (long)&bcm43430_device_data },
+-	{ "BCM2E7C" },
+-	{ "BCM2E7D" },
+-	{ "BCM2E7E" },
+-	{ "BCM2E7F" },
+ 	{ "BCM2E80", (long)&bcm43430_device_data },
+-	{ "BCM2E81" },
+-	{ "BCM2E82" },
+-	{ "BCM2E83" },
+-	{ "BCM2E84" },
+-	{ "BCM2E85" },
+-	{ "BCM2E86" },
+-	{ "BCM2E87" },
+-	{ "BCM2E88" },
+ 	{ "BCM2E89", (long)&bcm43430_device_data },
+-	{ "BCM2E8A" },
+-	{ "BCM2E8B" },
+-	{ "BCM2E8C" },
+-	{ "BCM2E8D" },
+-	{ "BCM2E8E" },
+-	{ "BCM2E90" },
+-	{ "BCM2E92" },
+-	{ "BCM2E93" },
+ 	{ "BCM2E94", (long)&bcm43430_device_data },
+ 	{ "BCM2E95" },
+ 	{ "BCM2E96" },
+diff -Naur a/drivers/input/joydev.c b/drivers/input/joydev.c
+--- a/drivers/input/joydev.c	2024-05-12 05:44:02.000000000 -0400
++++ b/drivers/input/joydev.c	2024-05-28 12:19:22.377444404 -0400
+@@ -790,15 +790,9 @@
+ 		.keybit = { [BIT_WORD(BTN_DIGI)] = BIT_MASK(BTN_DIGI) },
+ 	},
+ 	/* Disable accelerometers on composite devices */
+-	ACCEL_DEV(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS3_CONTROLLER),
+ 	ACCEL_DEV(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS4_CONTROLLER),
+ 	ACCEL_DEV(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS4_CONTROLLER_2),
+ 	ACCEL_DEV(USB_VENDOR_ID_SONY, USB_DEVICE_ID_SONY_PS4_CONTROLLER_DONGLE),
+-	ACCEL_DEV(USB_VENDOR_ID_THQ, USB_DEVICE_ID_THQ_PS3_UDRAW),
+-	ACCEL_DEV(USB_VENDOR_ID_NINTENDO, USB_DEVICE_ID_NINTENDO_PROCON),
+-	ACCEL_DEV(USB_VENDOR_ID_NINTENDO, USB_DEVICE_ID_NINTENDO_CHRGGRIP),
+-	ACCEL_DEV(USB_VENDOR_ID_NINTENDO, USB_DEVICE_ID_NINTENDO_JOYCONL),
+-	ACCEL_DEV(USB_VENDOR_ID_NINTENDO, USB_DEVICE_ID_NINTENDO_JOYCONR),
+ 	{ /* sentinel */ }
+ };
+ 
+diff -Naur a/drivers/scsi/scsi_devinfo.c b/drivers/scsi/scsi_devinfo.c
+--- a/drivers/scsi/scsi_devinfo.c	2024-05-12 05:44:02.000000000 -0400
++++ b/drivers/scsi/scsi_devinfo.c	2024-05-28 17:16:43.176600570 -0400
+@@ -54,190 +54,31 @@
+ 	blist_flags_t flags;
+ } scsi_static_device_list[] __initdata = {
+ 	/*
+-	 * The following devices are known not to tolerate a lun != 0 scan
+-	 * for one reason or another. Some will respond to all luns,
+-	 * others will lock up.
+-	 */
+-	{"Aashima", "IMAGERY 2400SP", "1.03", BLIST_NOLUN},	/* locks up */
+-	{"CHINON", "CD-ROM CDS-431", "H42", BLIST_NOLUN},	/* locks up */
+-	{"CHINON", "CD-ROM CDS-535", "Q14", BLIST_NOLUN},	/* locks up */
+-	{"DENON", "DRD-25X", "V", BLIST_NOLUN},			/* locks up */
+-	{"HITACHI", "DK312C", "CM81", BLIST_NOLUN},	/* responds to all lun */
+-	{"HITACHI", "DK314C", "CR21", BLIST_NOLUN},	/* responds to all lun */
+-	{"IBM", "2104-DU3", NULL, BLIST_NOLUN},		/* locks up */
+-	{"IBM", "2104-TU3", NULL, BLIST_NOLUN},		/* locks up */
+-	{"IMS", "CDD521/10", "2.06", BLIST_NOLUN},	/* locks up */
+-	{"MAXTOR", "XT-3280", "PR02", BLIST_NOLUN},	/* locks up */
+-	{"MAXTOR", "XT-4380S", "B3C", BLIST_NOLUN},	/* locks up */
+-	{"MAXTOR", "MXT-1240S", "I1.2", BLIST_NOLUN},	/* locks up */
+-	{"MAXTOR", "XT-4170S", "B5A", BLIST_NOLUN},	/* locks up */
+-	{"MAXTOR", "XT-8760S", "B7B", BLIST_NOLUN},	/* locks up */
+-	{"MEDIAVIS", "RENO CD-ROMX2A", "2.03", BLIST_NOLUN},	/* responds to all lun */
+-	{"MICROTEK", "ScanMakerIII", "2.30", BLIST_NOLUN},	/* responds to all lun */
+-	{"NEC", "CD-ROM DRIVE:841", "1.0", BLIST_NOLUN},/* locks up */
+-	{"PHILIPS", "PCA80SC", "V4-2", BLIST_NOLUN},	/* responds to all lun */
+-	{"RODIME", "RO3000S", "2.33", BLIST_NOLUN},	/* locks up */
+-	{"SUN", "SENA", NULL, BLIST_NOLUN},		/* responds to all luns */
+-	/*
+-	 * The following causes a failed REQUEST SENSE on lun 1 for
+-	 * aha152x controller, which causes SCSI code to reset bus.
+-	 */
+-	{"SANYO", "CRD-250S", "1.20", BLIST_NOLUN},
+-	/*
+-	 * The following causes a failed REQUEST SENSE on lun 1 for
+-	 * aha152x controller, which causes SCSI code to reset bus.
+-	 */
+-	{"SEAGATE", "ST157N", "\004|j", BLIST_NOLUN},
+-	{"SEAGATE", "ST296", "921", BLIST_NOLUN},	/* responds to all lun */
+-	{"SEAGATE", "ST1581", "6538", BLIST_NOLUN},	/* responds to all lun */
+-	{"SONY", "CD-ROM CDU-541", "4.3d", BLIST_NOLUN},
+-	{"SONY", "CD-ROM CDU-55S", "1.0i", BLIST_NOLUN},
+-	{"SONY", "CD-ROM CDU-561", "1.7x", BLIST_NOLUN},
+-	{"SONY", "CD-ROM CDU-8012", NULL, BLIST_NOLUN},
+-	{"SONY", "SDT-5000", "3.17", BLIST_SELECT_NO_ATN},
+-	{"TANDBERG", "TDC 3600", "U07", BLIST_NOLUN},	/* locks up */
+-	{"TEAC", "CD-R55S", "1.0H", BLIST_NOLUN},	/* locks up */
+-	/*
+-	 * The following causes a failed REQUEST SENSE on lun 1 for
+-	 * seagate controller, which causes SCSI code to reset bus.
+-	 */
+-	{"TEAC", "CD-ROM", "1.06", BLIST_NOLUN},
+-	{"TEAC", "MT-2ST/45S2-27", "RV M", BLIST_NOLUN},	/* responds to all lun */
+-	/*
+-	 * The following causes a failed REQUEST SENSE on lun 1 for
+-	 * seagate controller, which causes SCSI code to reset bus.
+-	 */
+-	{"HP", "C1750A", "3226", BLIST_NOLUN},		/* scanjet iic */
+-	{"HP", "C1790A", NULL, BLIST_NOLUN},		/* scanjet iip */
+-	{"HP", "C2500A", NULL, BLIST_NOLUN},		/* scanjet iicx */
+-	{"MEDIAVIS", "CDR-H93MV", "1.31", BLIST_NOLUN},	/* locks up */
+-	{"MICROTEK", "ScanMaker II", "5.61", BLIST_NOLUN},	/* responds to all lun */
+-	{"MITSUMI", "CD-R CR-2201CS", "6119", BLIST_NOLUN},	/* locks up */
+-	{"NEC", "D3856", "0009", BLIST_NOLUN},
+-	{"QUANTUM", "LPS525S", "3110", BLIST_NOLUN},	/* locks up */
+-	{"QUANTUM", "PD1225S", "3110", BLIST_NOLUN},	/* locks up */
+-	{"QUANTUM", "FIREBALL ST4.3S", "0F0C", BLIST_NOLUN},	/* locks up */
+-	{"RELISYS", "Scorpio", NULL, BLIST_NOLUN},	/* responds to all lun */
+-	{"SANKYO", "CP525", "6.64", BLIST_NOLUN},	/* causes failed REQ SENSE, extra reset */
+-	{"TEXEL", "CD-ROM", "1.06", BLIST_NOLUN | BLIST_BORKEN},
+-	{"transtec", "T5008", "0001", BLIST_NOREPORTLUN },
+-	{"YAMAHA", "CDR100", "1.00", BLIST_NOLUN},	/* locks up */
+-	{"YAMAHA", "CDR102", "1.00", BLIST_NOLUN},	/* locks up */
+-	{"YAMAHA", "CRW8424S", "1.0", BLIST_NOLUN},	/* locks up */
+-	{"YAMAHA", "CRW6416S", "1.0c", BLIST_NOLUN},	/* locks up */
+-	{"", "Scanner", "1.80", BLIST_NOLUN},	/* responds to all lun */
+-
+-	/*
+ 	 * Other types of devices that have special flags.
+ 	 * Note that all USB devices should have the BLIST_INQUIRY_36 flag.
+ 	 */
+-	{"3PARdata", "VV", NULL, BLIST_REPORTLUN2},
+-	{"ADAPTEC", "AACRAID", NULL, BLIST_FORCELUN},
+-	{"ADAPTEC", "Adaptec 5400S", NULL, BLIST_FORCELUN},
+ 	{"AIX", "VDASD", NULL, BLIST_TRY_VPD_PAGES | BLIST_NO_VPD_SIZE},
+-	{"AFT PRO", "-IX CF", "0.0>", BLIST_FORCELUN},
+-	{"BELKIN", "USB 2 HS-CF", "1.95",  BLIST_FORCELUN | BLIST_INQUIRY_36},
+-	{"BROWNIE", "1200U3P", NULL, BLIST_NOREPORTLUN},
+-	{"BROWNIE", "1600U3P", NULL, BLIST_NOREPORTLUN},
+-	{"CANON", "IPUBJD", NULL, BLIST_SPARSELUN},
+-	{"CBOX3", "USB Storage-SMC", "300A", BLIST_FORCELUN | BLIST_INQUIRY_36},
+-	{"CMD", "CRA-7280", NULL, BLIST_SPARSELUN},	/* CMD RAID Controller */
+-	{"CNSI", "G7324", NULL, BLIST_SPARSELUN},	/* Chaparral G7324 RAID */
+-	{"CNSi", "G8324", NULL, BLIST_SPARSELUN},	/* Chaparral G8324 RAID */
+-	{"COMPAQ", "ARRAY CONTROLLER", NULL, BLIST_SPARSELUN | BLIST_LARGELUN |
+-		BLIST_MAX_512 | BLIST_REPORTLUN2},	/* Compaq RA4x00 */
+-	{"COMPAQ", "LOGICAL VOLUME", NULL, BLIST_FORCELUN | BLIST_MAX_512}, /* Compaq RA4x00 */
+-	{"COMPAQ", "CR3500", NULL, BLIST_FORCELUN},
+-	{"COMPAQ", "MSA1000", NULL, BLIST_SPARSELUN | BLIST_NOSTARTONADD},
+-	{"COMPAQ", "MSA1000 VOLUME", NULL, BLIST_SPARSELUN | BLIST_NOSTARTONADD},
+-	{"COMPAQ", "HSV110", NULL, BLIST_REPORTLUN2 | BLIST_NOSTARTONADD},
+-	{"DDN", "SAN DataDirector", "*", BLIST_SPARSELUN},
+-	{"DEC", "HSG80", NULL, BLIST_REPORTLUN2 | BLIST_NOSTARTONADD},
+-	{"DELL", "PV660F", NULL, BLIST_SPARSELUN},
+-	{"DELL", "PV660F   PSEUDO", NULL, BLIST_SPARSELUN},
+-	{"DELL", "PSEUDO DEVICE .", NULL, BLIST_SPARSELUN},	/* Dell PV 530F */
+-	{"DELL", "PV530F", NULL, BLIST_SPARSELUN},
+-	{"DELL", "PERCRAID", NULL, BLIST_FORCELUN},
+-	{"DGC", "RAID", NULL, BLIST_SPARSELUN},	/* EMC CLARiiON, storage on LUN 0 */
+-	{"DGC", "DISK", NULL, BLIST_SPARSELUN},	/* EMC CLARiiON, no storage on LUN 0 */
+-	{"EMC",  "Invista", "*", BLIST_SPARSELUN | BLIST_LARGELUN},
+-	{"EMC", "SYMMETRIX", NULL, BLIST_SPARSELUN | BLIST_LARGELUN |
+-	 BLIST_REPORTLUN2 | BLIST_RETRY_ITF},
+-	{"EMULEX", "MD21/S2     ESDI", NULL, BLIST_SINGLELUN},
+-	{"easyRAID", "16P", NULL, BLIST_NOREPORTLUN},
+-	{"easyRAID", "X6P", NULL, BLIST_NOREPORTLUN},
+-	{"easyRAID", "F8", NULL, BLIST_NOREPORTLUN},
+-	{"FSC", "CentricStor", "*", BLIST_SPARSELUN | BLIST_LARGELUN},
+ 	{"FUJITSU", "ETERNUS_DXM", "*", BLIST_RETRY_ASC_C1},
+ 	{"Generic", "USB SD Reader", "1.00", BLIST_FORCELUN | BLIST_INQUIRY_36},
+ 	{"Generic", "USB Storage-SMC", NULL, BLIST_FORCELUN | BLIST_INQUIRY_36}, /* FW: 0180 and 0207 */
+ 	{"Generic", "Ultra HS-SD/MMC", "2.09", BLIST_IGN_MEDIA_CHANGE | BLIST_INQUIRY_36},
+-	{"HITACHI", "DF400", "*", BLIST_REPORTLUN2},
+-	{"HITACHI", "DF500", "*", BLIST_REPORTLUN2},
+-	{"HITACHI", "DISK-SUBSYSTEM", "*", BLIST_REPORTLUN2},
+ 	{"HITACHI", "HUS1530", "*", BLIST_NO_DIF},
+ 	{"HITACHI", "OPEN-", "*", BLIST_REPORTLUN2 | BLIST_TRY_VPD_PAGES},
+-	{"HP", "A6189A", NULL, BLIST_SPARSELUN | BLIST_LARGELUN},	/* HP VA7400 */
+ 	{"HP", "OPEN-", "*", BLIST_REPORTLUN2 | BLIST_TRY_VPD_PAGES}, /* HP XP Arrays */
+-	{"HP", "NetRAID-4M", NULL, BLIST_FORCELUN},
+-	{"HP", "HSV100", NULL, BLIST_REPORTLUN2 | BLIST_NOSTARTONADD},
+-	{"HP", "C1557A", NULL, BLIST_FORCELUN},
+-	{"HP", "C3323-300", "4269", BLIST_NOTQ},
+-	{"HP", "C5713A", NULL, BLIST_NOREPORTLUN},
+ 	{"HP", "DISK-SUBSYSTEM", "*", BLIST_REPORTLUN2},
+ 	{"HPE", "OPEN-", "*", BLIST_REPORTLUN2 | BLIST_TRY_VPD_PAGES},
+-	{"IBM", "AuSaV1S2", NULL, BLIST_FORCELUN},
+-	{"IBM", "ProFibre 4000R", "*", BLIST_SPARSELUN | BLIST_LARGELUN},
+ 	{"IBM", "2076", NULL, BLIST_NO_VPD_SIZE},
+-	{"IBM", "2105", NULL, BLIST_RETRY_HWERROR},
+-	{"iomega", "jaz 1GB", "J.86", BLIST_NOTQ | BLIST_NOLUN},
+-	{"IOMEGA", "ZIP", NULL, BLIST_NOTQ | BLIST_NOLUN},
+-	{"IOMEGA", "Io20S         *F", NULL, BLIST_KEY},
+-	{"INSITE", "Floptical   F*8I", NULL, BLIST_KEY},
+-	{"INSITE", "I325VM", NULL, BLIST_KEY},
+ 	{"Intel", "Multi-Flex", NULL, BLIST_NO_RSOC},
+-	{"iRiver", "iFP Mass Driver", NULL, BLIST_NOT_LOCKABLE | BLIST_INQUIRY_36},
+-	{"LASOUND", "CDX7405", "3.10", BLIST_MAX5LUN | BLIST_SINGLELUN},
+ 	{"Marvell", "Console", NULL, BLIST_SKIP_VPD_PAGES},
+ 	{"Marvell", "91xx Config", "1.01", BLIST_SKIP_VPD_PAGES},
+-	{"MATSHITA", "PD-1", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"MATSHITA", "DMC-LC5", NULL, BLIST_NOT_LOCKABLE | BLIST_INQUIRY_36},
+-	{"MATSHITA", "DMC-LC40", NULL, BLIST_NOT_LOCKABLE | BLIST_INQUIRY_36},
+-	{"Medion", "Flash XL  MMC/SD", "2.6D", BLIST_FORCELUN},
+-	{"MegaRAID", "LD", NULL, BLIST_FORCELUN},
+-	{"MICROP", "4110", NULL, BLIST_NOTQ},
+-	{"MSFT", "Virtual HD", NULL, BLIST_MAX_1024 | BLIST_NO_RSOC},
+-	{"MYLEX", "DACARMRB", "*", BLIST_REPORTLUN2},
+-	{"nCipher", "Fastness Crypto", NULL, BLIST_FORCELUN},
+-	{"NAKAMICH", "MJ-4.8S", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"NAKAMICH", "MJ-5.16S", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"NEC", "PD-1 ODX654P", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"NEC", "iStorage", NULL, BLIST_REPORTLUN2},
+-	{"NRC", "MBR-7", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"NRC", "MBR-7.4", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"PIONEER", "CD-ROM DRM-600", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"PIONEER", "CD-ROM DRM-602X", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"PIONEER", "CD-ROM DRM-604X", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+-	{"PIONEER", "CD-ROM DRM-624X", NULL, BLIST_FORCELUN | BLIST_SINGLELUN},
+ 	{"Promise", "VTrak E610f", NULL, BLIST_SPARSELUN | BLIST_NO_RSOC},
+ 	{"Promise", "", NULL, BLIST_SPARSELUN},
+ 	{"QEMU", "QEMU CD-ROM", NULL, BLIST_SKIP_VPD_PAGES},
+ 	{"QNAP", "iSCSI Storage", NULL, BLIST_MAX_1024},
+ 	{"SYNOLOGY", "iSCSI Storage", NULL, BLIST_MAX_1024},
+ 	{"QUANTUM", "XP34301", "1071", BLIST_NOTQ},
+-	{"REGAL", "CDC-4X", NULL, BLIST_MAX5LUN | BLIST_SINGLELUN},
+-	{"SanDisk", "ImageMate CF-SD1", NULL, BLIST_FORCELUN},
+-	{"SEAGATE", "ST34555N", "0930", BLIST_NOTQ},	/* Chokes on tagged INQUIRY */
+-	{"SEAGATE", "ST3390N", "9546", BLIST_NOTQ},
+ 	{"SEAGATE", "ST900MM0006", NULL, BLIST_SKIP_VPD_PAGES},
+-	{"SGI", "RAID3", "*", BLIST_SPARSELUN},
+-	{"SGI", "RAID5", "*", BLIST_SPARSELUN},
+-	{"SGI", "TP9100", "*", BLIST_REPORTLUN2},
+-	{"SGI", "Universal Xport", "*", BLIST_NO_ULD_ATTACH},
+ 	{"SKhynix", "H28U74301AMR", NULL, BLIST_SKIP_VPD_PAGES},
+-	{"IBM", "Universal Xport", "*", BLIST_NO_ULD_ATTACH},
+-	{"SUN", "Universal Xport", "*", BLIST_NO_ULD_ATTACH},
+-	{"DELL", "Universal Xport", "*", BLIST_NO_ULD_ATTACH},
+ 	{"STK", "Universal Xport", "*", BLIST_NO_ULD_ATTACH},
+ 	{"NETAPP", "Universal Xport", "*", BLIST_NO_ULD_ATTACH},
+ 	{"LSI", "Universal Xport", "*", BLIST_NO_ULD_ATTACH},
+@@ -246,24 +87,8 @@
+ 	{"FUJITSU", "Universal Xport", "*", BLIST_NO_ULD_ATTACH},
+ 	{"SanDisk", "Cruzer Blade", NULL, BLIST_TRY_VPD_PAGES |
+ 		BLIST_INQUIRY_36},
+-	{"SMSC", "USB 2 HS-CF", NULL, BLIST_SPARSELUN | BLIST_INQUIRY_36},
+-	{"SONY", "CD-ROM CDU-8001", NULL, BLIST_BORKEN},
+-	{"SONY", "TSL", NULL, BLIST_FORCELUN},		/* DDS3 & DDS4 autoloaders */
+-	{"ST650211", "CF", NULL, BLIST_RETRY_HWERROR},
+-	{"SUN", "T300", "*", BLIST_SPARSELUN},
+-	{"SUN", "T4", "*", BLIST_SPARSELUN},
+-	{"Tornado-", "F4", "*", BLIST_NOREPORTLUN},
+-	{"TOSHIBA", "CDROM", NULL, BLIST_ISROM},
+-	{"TOSHIBA", "CD-ROM", NULL, BLIST_ISROM},
+ 	{"Traxdata", "CDR4120", NULL, BLIST_NOLUN},	/* locks up */
+ 	{"USB2.0", "SMARTMEDIA/XD", NULL, BLIST_FORCELUN | BLIST_INQUIRY_36},
+-	{"WangDAT", "Model 2600", "01.7", BLIST_SELECT_NO_ATN},
+-	{"WangDAT", "Model 3200", "02.2", BLIST_SELECT_NO_ATN},
+-	{"WangDAT", "Model 1300", "02.4", BLIST_SELECT_NO_ATN},
+-	{"WDC WD25", "00JB-00FUA0", NULL, BLIST_NOREPORTLUN},
+-	{"XYRATEX", "RS", "*", BLIST_SPARSELUN | BLIST_LARGELUN},
+-	{"Zzyzx", "RocketStor 500S", NULL, BLIST_SPARSELUN},
+-	{"Zzyzx", "RocketStor 2000", NULL, BLIST_SPARSELUN},
+ 	{ NULL, NULL, NULL, 0 },
+ };
+ 
