@@ -23,10 +23,16 @@
       ACTION=="add|change", KERNEL=="nvme[0-9]*n[0-9]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="none"
     '';
 
+    # these two lines save 4 whole seconds during userspace boot, according to systemd-analyze.
+    # if you're using a USB cellular internet modem (e.g. 4G, LTE, 5G, etc), then don't disable ModemManager
+    systemd.services.mount-pstore.enable = false;
+    systemd.services.ModemManager.enable = false;
+
     boot.initrd.includeDefaultModules = false;
     boot.initrd.availableKernelModules = [
-      # list of initrd modules stolen from
+      # list of initrd modules originally stolen by tpwrules from
       # https://github.com/AsahiLinux/asahi-scripts/blob/f461f080a1d2575ae4b82879b5624360db3cff8c/initcpio/install/asahi
+      # refined by zzywysm to match his custom kernel configs
       "tps6598x"
       "dwc3"
       "dwc3-haps"
@@ -51,9 +57,13 @@
     ];
 
     boot.kernelParams = [
-      "console=ttySAC0,115200n8"
-      "console=tty0"
+      # nice insurance against f***ing up the kernel so much, the Mac no longer boots
+      # (NixOS generations are another wonderful insurance policy, obvs)
       "boot.shell_on_fail"
+      # most folks don't need these console specifiers
+      # if you're doing kernel driver development, uncomment them
+      # "console=ttySAC0,115200n8"
+      # "console=tty0"
       # Apple's SSDs are slow (~dozens of ms) at processing flush requests which
       # slows down programs that make a lot of fsync calls. This parameter sets
       # a delay in ms before actually flushing so that such requests can be
@@ -62,6 +72,12 @@
       # UNBOUNDED data corruption in case of power loss!!!! Don't even think
       # about it on desktops!!
       "nvme_apple.flush_interval=0"
+      # make boot mostly silent, not because we don't appreciate the useful
+      # information (we do), but because spew slows down boot
+      "quiet"
+      "loglevel=4"
+      "systemd.show_status=auto"
+      "rd.udev.log_level=4"
     ];
 
     # U-Boot does not support EFI variables
