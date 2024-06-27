@@ -128,6 +128,24 @@ let
         { name = "joeygouly-arm-hacks";
           patch = ./joeygouly-arm-hacks.patch;
         }
+        { name = "bbr3";
+          patch = ./patches-6.8/0001-tcp-bbr3-initial-import.patch;
+          extraStructuredConfig = with lib.kernel; {
+            TCP_CONG_BBR = yes;
+          };
+        }
+        { name = "zstd-1.5.6";
+          patch = ./patches-6.8/0001-zstd-6.8-merge-v1.5.6-into-kernel-tree.patch;
+        }
+        { name = "zstd-fix";
+          patch = ./patches-6.8/0002-lib-zstd-Refactor-intentional-wrap-around-test.patch;
+        }
+        { name = "no-stack-conserve";
+          patch = ./patches-6.8/0004-ZEN-Disable-stack-conservation-for-GCC.patch;
+        }
+        { name = "no-unpriv-userns";
+          patch = ./patches-6.8/0006-ZEN-Add-sysctl-and-CONFIG-to-disallow-unprivileged-C.patch;
+        }
       ] ++ _kernelPatches;
 
       inherit configfile;
