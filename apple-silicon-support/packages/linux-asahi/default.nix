@@ -125,6 +125,9 @@ let
         { name = "even-more-quirks";
           patch = ./even-more-quirks.patch;
         }
+        { name = "joeygouly-arm-hacks";
+          patch = ./joeygouly-arm-hacks.patch;
+        }
       ] ++ _kernelPatches;
 
       inherit configfile;

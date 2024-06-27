@@ -1,0 +1,738 @@
+diff -Naur a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+--- a/arch/arm64/include/asm/assembler.h	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/include/asm/assembler.h	2024-06-06 16:33:28.562352403 -0400
+@@ -18,7 +18,6 @@
+ #include <asm/asm-bug.h>
+ #include <asm/asm-extable.h>
+ #include <asm/asm-offsets.h>
+-#include <asm/cpufeature.h>
+ #include <asm/cputype.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/page.h>
+diff -Naur a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+--- a/arch/arm64/include/asm/cpufeature.h	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/include/asm/cpufeature.h	2024-06-06 16:33:28.562352403 -0400
+@@ -584,23 +584,17 @@
+ 
+ static inline bool id_aa64pfr0_32bit_el1(u64 pfr0)
+ {
+-	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_EL1_SHIFT);
+-
+-	return val == ID_AA64PFR0_EL1_ELx_32BIT_64BIT;
++	return false;
+ }
+ 
+ static inline bool id_aa64pfr0_32bit_el0(u64 pfr0)
+ {
+-	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_EL0_SHIFT);
+-
+-	return val == ID_AA64PFR0_EL1_ELx_32BIT_64BIT;
++	return false;
+ }
+ 
+ static inline bool id_aa64pfr0_sve(u64 pfr0)
+ {
+-	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_SVE_SHIFT);
+-
+-	return val > 0;
++	return false;
+ }
+ 
+ static inline bool id_aa64pfr1_sme(u64 pfr1)
+@@ -612,9 +606,7 @@
+ 
+ static inline bool id_aa64pfr1_mte(u64 pfr1)
+ {
+-	u32 val = cpuid_feature_extract_unsigned_field(pfr1, ID_AA64PFR1_EL1_MTE_SHIFT);
+-
+-	return val >= ID_AA64PFR1_EL1_MTE_MTE2;
++	return false;
+ }
+ 
+ void __init setup_boot_cpu_features(void);
+@@ -628,7 +620,7 @@
+ 
+ static inline bool cpu_supports_mixed_endian_el0(void)
+ {
+-	return id_aa64mmfr0_mixed_endian_el0(read_cpuid(ID_AA64MMFR0_EL1));
++	return false;
+ }
+ 
+ 
+@@ -665,10 +657,7 @@
+ 
+ static inline bool system_supports_32bit_el0(void)
+ {
+-	u64 pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+-
+-	return static_branch_unlikely(&arm64_mismatched_32bit_el0) ||
+-	       id_aa64pfr0_32bit_el0(pfr0);
++	return false;
+ }
+ 
+ static inline bool system_supports_4kb_granule(void)
+@@ -686,15 +675,7 @@
+ 
+ static inline bool system_supports_64kb_granule(void)
+ {
+-	u64 mmfr0;
+-	u32 val;
+-
+-	mmfr0 =	read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+-	val = cpuid_feature_extract_unsigned_field(mmfr0,
+-						ID_AA64MMFR0_EL1_TGRAN64_SHIFT);
+-
+-	return (val >= ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MIN) &&
+-	       (val <= ID_AA64MMFR0_EL1_TGRAN64_SUPPORTED_MAX);
++	return false;
+ }
+ 
+ static inline bool system_supports_16kb_granule(void)
+@@ -712,19 +693,12 @@
+ 
+ static inline bool system_supports_mixed_endian_el0(void)
+ {
+-	return id_aa64mmfr0_mixed_endian_el0(read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1));
++	return false;
+ }
+ 
+ static inline bool system_supports_mixed_endian(void)
+ {
+-	u64 mmfr0;
+-	u32 val;
+-
+-	mmfr0 =	read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+-	val = cpuid_feature_extract_unsigned_field(mmfr0,
+-						ID_AA64MMFR0_EL1_BIGEND_SHIFT);
+-
+-	return val == 0x1;
++	return false;
+ }
+ 
+ static __always_inline bool system_supports_fpsimd(void)
+@@ -745,7 +719,7 @@
+ 
+ static __always_inline bool system_supports_sve(void)
+ {
+-	return alternative_has_cap_unlikely(ARM64_SVE);
++	return false;
+ }
+ 
+ static __always_inline bool system_supports_sme(void)
+diff -Naur a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+--- a/arch/arm64/include/asm/io.h	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/include/asm/io.h	2024-06-06 16:33:28.562352403 -0400
+@@ -16,7 +16,6 @@
+ #include <asm/memory.h>
+ #include <asm/early_ioremap.h>
+ #include <asm/alternative.h>
+-#include <asm/cpufeature.h>
+ 
+ /*
+  * Generic IO read/write.  These perform native-endian accesses.
+diff -Naur a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+--- a/arch/arm64/include/asm/kvm_emulate.h	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/include/asm/kvm_emulate.h	2024-06-06 16:33:28.562352403 -0400
+@@ -58,7 +58,7 @@
+ #if defined(__KVM_VHE_HYPERVISOR__) || defined(__KVM_NVHE_HYPERVISOR__)
+ static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+ {
+-	return !(vcpu->arch.hcr_el2 & HCR_RW);
++	return false;
+ }
+ #else
+ static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+@@ -160,7 +160,7 @@
+ 
+ static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+ {
+-	return !!(*vcpu_cpsr(vcpu) & PSR_MODE32_BIT);
++	return false;
+ }
+ 
+ static __always_inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
+diff -Naur a/arch/arm64/include/asm/lse.h b/arch/arm64/include/asm/lse.h
+--- a/arch/arm64/include/asm/lse.h	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/include/asm/lse.h	2024-06-06 16:33:28.562352403 -0400
+@@ -18,9 +18,7 @@
+ 
+ #define __lse_ll_sc_body(op, ...)					\
+ ({									\
+-	alternative_has_cap_likely(ARM64_HAS_LSE_ATOMICS) ?		\
+-		__lse_##op(__VA_ARGS__) :				\
+-		__ll_sc_##op(__VA_ARGS__);				\
++		__lse_##op(__VA_ARGS__);				\
+ })
+ 
+ /* In-line patching at runtime */
+diff -Naur a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+--- a/arch/arm64/include/asm/virt.h	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/include/asm/virt.h	2024-06-06 16:33:28.562352403 -0400
+@@ -137,10 +137,7 @@
+ 
+ static __always_inline bool is_protected_kvm_enabled(void)
+ {
+-	if (is_vhe_hyp_code())
+-		return false;
+-	else
+-		return cpus_have_final_cap(ARM64_KVM_PROTECTED_MODE);
++	return false;
+ }
+ 
+ static __always_inline bool has_hvhe(void)
+diff -Naur a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+--- a/arch/arm64/kvm/handle_exit.c	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/kvm/handle_exit.c	2024-06-06 16:33:28.565685465 -0400
+@@ -255,9 +255,9 @@
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+-	[ESR_ELx_EC_CP15_32]	= kvm_handle_cp15_32,
++	[ESR_ELx_EC_CP15_32]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_CP15_64]	= kvm_handle_cp15_64,
+-	[ESR_ELx_EC_CP14_MR]	= kvm_handle_cp14_32,
++	[ESR_ELx_EC_CP14_MR]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_CP14_LS]	= kvm_handle_cp14_load_store,
+ 	[ESR_ELx_EC_CP10_ID]	= kvm_handle_cp10_id,
+ 	[ESR_ELx_EC_CP14_64]	= kvm_handle_cp14_64,
+diff -Naur a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+--- a/arch/arm64/kvm/hyp/exception.c	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/kvm/hyp/exception.c	2024-06-06 16:35:31.199696667 -0400
+@@ -55,21 +55,6 @@
+ 	}
+ }
+ 
+-static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
+-{
+-	if (has_vhe())
+-		write_sysreg(val, spsr_abt);
+-	else
+-		vcpu->arch.ctxt.spsr_abt = val;
+-}
+-
+-static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
+-{
+-	if (has_vhe())
+-		write_sysreg(val, spsr_und);
+-	else
+-		vcpu->arch.ctxt.spsr_und = val;
+-}
+ 
+ /*
+  * This performs the exception entry at a given EL (@target_mode), stashing PC
+@@ -171,103 +156,6 @@
+ 	__vcpu_write_spsr(vcpu, target_mode, old);
+ }
+ 
+-/*
+- * When an exception is taken, most CPSR fields are left unchanged in the
+- * handler. However, some are explicitly overridden (e.g. M[4:0]).
+- *
+- * The SPSR/SPSR_ELx layouts differ, and the below is intended to work with
+- * either format. Note: SPSR.J bit doesn't exist in SPSR_ELx, but this bit was
+- * obsoleted by the ARMv7 virtualization extensions and is RES0.
+- *
+- * For the SPSR layout seen from AArch32, see:
+- * - ARM DDI 0406C.d, page B1-1148
+- * - ARM DDI 0487E.a, page G8-6264
+- *
+- * For the SPSR_ELx layout for AArch32 seen from AArch64, see:
+- * - ARM DDI 0487E.a, page C5-426
+- *
+- * Here we manipulate the fields in order of the AArch32 SPSR_ELx layout, from
+- * MSB to LSB.
+- */
+-static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
+-{
+-	u32 sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+-	unsigned long old, new;
+-
+-	old = *vcpu_cpsr(vcpu);
+-	new = 0;
+-
+-	new |= (old & PSR_AA32_N_BIT);
+-	new |= (old & PSR_AA32_Z_BIT);
+-	new |= (old & PSR_AA32_C_BIT);
+-	new |= (old & PSR_AA32_V_BIT);
+-	new |= (old & PSR_AA32_Q_BIT);
+-
+-	// CPSR.IT[7:0] are set to zero upon any exception
+-	// See ARM DDI 0487E.a, section G1.12.3
+-	// See ARM DDI 0406C.d, section B1.8.3
+-
+-	new |= (old & PSR_AA32_DIT_BIT);
+-
+-	// CPSR.SSBS is set to SCTLR.DSSBS upon any exception
+-	// See ARM DDI 0487E.a, page G8-6244
+-	if (sctlr & BIT(31))
+-		new |= PSR_AA32_SSBS_BIT;
+-
+-	// CPSR.PAN is unchanged unless SCTLR.SPAN == 0b0
+-	// SCTLR.SPAN is RES1 when ARMv8.1-PAN is not implemented
+-	// See ARM DDI 0487E.a, page G8-6246
+-	new |= (old & PSR_AA32_PAN_BIT);
+-	if (!(sctlr & BIT(23)))
+-		new |= PSR_AA32_PAN_BIT;
+-
+-	// SS does not exist in AArch32, so ignore
+-
+-	// CPSR.IL is set to zero upon any exception
+-	// See ARM DDI 0487E.a, page G1-5527
+-
+-	new |= (old & PSR_AA32_GE_MASK);
+-
+-	// CPSR.IT[7:0] are set to zero upon any exception
+-	// See prior comment above
+-
+-	// CPSR.E is set to SCTLR.EE upon any exception
+-	// See ARM DDI 0487E.a, page G8-6245
+-	// See ARM DDI 0406C.d, page B4-1701
+-	if (sctlr & BIT(25))
+-		new |= PSR_AA32_E_BIT;
+-
+-	// CPSR.A is unchanged upon an exception to Undefined, Supervisor
+-	// CPSR.A is set upon an exception to other modes
+-	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
+-	// See ARM DDI 0406C.d, page B1-1182
+-	new |= (old & PSR_AA32_A_BIT);
+-	if (mode != PSR_AA32_MODE_UND && mode != PSR_AA32_MODE_SVC)
+-		new |= PSR_AA32_A_BIT;
+-
+-	// CPSR.I is set upon any exception
+-	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
+-	// See ARM DDI 0406C.d, page B1-1182
+-	new |= PSR_AA32_I_BIT;
+-
+-	// CPSR.F is set upon an exception to FIQ
+-	// CPSR.F is unchanged upon an exception to other modes
+-	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
+-	// See ARM DDI 0406C.d, page B1-1182
+-	new |= (old & PSR_AA32_F_BIT);
+-	if (mode == PSR_AA32_MODE_FIQ)
+-		new |= PSR_AA32_F_BIT;
+-
+-	// CPSR.T is set to SCTLR.TE upon any exception
+-	// See ARM DDI 0487E.a, page G8-5514
+-	// See ARM DDI 0406C.d, page B1-1181
+-	if (sctlr & BIT(30))
+-		new |= PSR_AA32_T_BIT;
+-
+-	new |= mode;
+-
+-	return new;
+-}
+ 
+ /*
+  * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
+@@ -285,35 +173,7 @@
+ 
+ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ {
+-	unsigned long spsr = *vcpu_cpsr(vcpu);
+-	bool is_thumb = (spsr & PSR_AA32_T_BIT);
+-	u32 sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+-	u32 return_address;
+-
+-	*vcpu_cpsr(vcpu) = get_except32_cpsr(vcpu, mode);
+-	return_address   = *vcpu_pc(vcpu);
+-	return_address  += return_offsets[vect_offset >> 2][is_thumb];
+-
+-	/* KVM only enters the ABT and UND modes, so only deal with those */
+-	switch(mode) {
+-	case PSR_AA32_MODE_ABT:
+-		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
+-		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
+-		break;
+-
+-	case PSR_AA32_MODE_UND:
+-		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
+-		vcpu_gp_regs(vcpu)->compat_lr_und = return_address;
+-		break;
+-	}
+-
+-	/* Branch to exception vector */
+-	if (sctlr & (1 << 13))
+-		vect_offset += 0xffff0000;
+-	else /* always have security exceptions */
+-		vect_offset += __vcpu_read_sys_reg(vcpu, VBAR_EL1);
+-
+-	*vcpu_pc(vcpu) = vect_offset;
++	return;
+ }
+ 
+ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+diff -Naur a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c	2024-06-06 16:33:28.565685465 -0400
+@@ -284,7 +284,6 @@
+ {
+ 	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
+ 
+-	__pkvm_vcpu_init_traps(kern_hyp_va(vcpu));
+ }
+ 
+ static void handle___pkvm_init_vm(struct kvm_cpu_context *host_ctxt)
+diff -Naur a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c	2024-06-06 18:05:15.094594856 -0400
+@@ -246,40 +246,7 @@
+ 	return pvm_read_id_reg(vcpu, reg_to_encoding(r));
+ }
+ 
+-/* Handler to RAZ/WI sysregs */
+-static bool pvm_access_raz_wi(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+-			      const struct sys_reg_desc *r)
+-{
+-	if (!p->is_write)
+-		p->regval = 0;
+-
+-	return true;
+-}
+-
+-/*
+- * Accessor for AArch32 feature id registers.
+- *
+- * The value of these registers is "unknown" according to the spec if AArch32
+- * isn't supported.
+- */
+-static bool pvm_access_id_aarch32(struct kvm_vcpu *vcpu,
+-				  struct sys_reg_params *p,
+-				  const struct sys_reg_desc *r)
+-{
+-	if (p->is_write) {
+-		inject_undef64(vcpu);
+-		return false;
+-	}
+ 
+-	/*
+-	 * No support for AArch32 guests, therefore, pKVM has no sanitized copy
+-	 * of AArch32 feature id registers.
+-	 */
+-	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL1),
+-		     PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) > ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
+-
+-	return pvm_access_raz_wi(vcpu, p, r);
+-}
+ 
+ /*
+  * Accessor for AArch64 feature id registers.
+@@ -301,16 +268,6 @@
+ 	return true;
+ }
+ 
+-static bool pvm_gic_read_sre(struct kvm_vcpu *vcpu,
+-			     struct sys_reg_params *p,
+-			     const struct sys_reg_desc *r)
+-{
+-	/* pVMs only support GICv3. 'nuf said. */
+-	if (!p->is_write)
+-		p->regval = ICC_SRE_EL1_DIB | ICC_SRE_EL1_DFB | ICC_SRE_EL1_SRE;
+-
+-	return true;
+-}
+ 
+ /* Mark the specified system register as an AArch32 feature id register. */
+ #define AARCH32(REG) { SYS_DESC(REG), .access = pvm_access_id_aarch32 }
+@@ -342,110 +299,6 @@
+  * it will lead to injecting an exception into the guest.
+  */
+ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+-	/* Cache maintenance by set/way operations are restricted. */
+-
+-	/* Debug and Trace Registers are restricted. */
+-
+-	/* AArch64 mappings of the AArch32 ID registers */
+-	/* CRm=1 */
+-	AARCH32(SYS_ID_PFR0_EL1),
+-	AARCH32(SYS_ID_PFR1_EL1),
+-	AARCH32(SYS_ID_DFR0_EL1),
+-	AARCH32(SYS_ID_AFR0_EL1),
+-	AARCH32(SYS_ID_MMFR0_EL1),
+-	AARCH32(SYS_ID_MMFR1_EL1),
+-	AARCH32(SYS_ID_MMFR2_EL1),
+-	AARCH32(SYS_ID_MMFR3_EL1),
+-
+-	/* CRm=2 */
+-	AARCH32(SYS_ID_ISAR0_EL1),
+-	AARCH32(SYS_ID_ISAR1_EL1),
+-	AARCH32(SYS_ID_ISAR2_EL1),
+-	AARCH32(SYS_ID_ISAR3_EL1),
+-	AARCH32(SYS_ID_ISAR4_EL1),
+-	AARCH32(SYS_ID_ISAR5_EL1),
+-	AARCH32(SYS_ID_MMFR4_EL1),
+-	AARCH32(SYS_ID_ISAR6_EL1),
+-
+-	/* CRm=3 */
+-	AARCH32(SYS_MVFR0_EL1),
+-	AARCH32(SYS_MVFR1_EL1),
+-	AARCH32(SYS_MVFR2_EL1),
+-	ID_UNALLOCATED(3,3),
+-	AARCH32(SYS_ID_PFR2_EL1),
+-	AARCH32(SYS_ID_DFR1_EL1),
+-	AARCH32(SYS_ID_MMFR5_EL1),
+-	ID_UNALLOCATED(3,7),
+-
+-	/* AArch64 ID registers */
+-	/* CRm=4 */
+-	AARCH64(SYS_ID_AA64PFR0_EL1),
+-	AARCH64(SYS_ID_AA64PFR1_EL1),
+-	ID_UNALLOCATED(4,2),
+-	ID_UNALLOCATED(4,3),
+-	AARCH64(SYS_ID_AA64ZFR0_EL1),
+-	ID_UNALLOCATED(4,5),
+-	ID_UNALLOCATED(4,6),
+-	ID_UNALLOCATED(4,7),
+-	AARCH64(SYS_ID_AA64DFR0_EL1),
+-	AARCH64(SYS_ID_AA64DFR1_EL1),
+-	ID_UNALLOCATED(5,2),
+-	ID_UNALLOCATED(5,3),
+-	AARCH64(SYS_ID_AA64AFR0_EL1),
+-	AARCH64(SYS_ID_AA64AFR1_EL1),
+-	ID_UNALLOCATED(5,6),
+-	ID_UNALLOCATED(5,7),
+-	AARCH64(SYS_ID_AA64ISAR0_EL1),
+-	AARCH64(SYS_ID_AA64ISAR1_EL1),
+-	AARCH64(SYS_ID_AA64ISAR2_EL1),
+-	ID_UNALLOCATED(6,3),
+-	ID_UNALLOCATED(6,4),
+-	ID_UNALLOCATED(6,5),
+-	ID_UNALLOCATED(6,6),
+-	ID_UNALLOCATED(6,7),
+-	AARCH64(SYS_ID_AA64MMFR0_EL1),
+-	AARCH64(SYS_ID_AA64MMFR1_EL1),
+-	AARCH64(SYS_ID_AA64MMFR2_EL1),
+-	ID_UNALLOCATED(7,3),
+-	ID_UNALLOCATED(7,4),
+-	ID_UNALLOCATED(7,5),
+-	ID_UNALLOCATED(7,6),
+-	ID_UNALLOCATED(7,7),
+-
+-	/* Scalable Vector Registers are restricted. */
+-
+-	RAZ_WI(SYS_ERRIDR_EL1),
+-	RAZ_WI(SYS_ERRSELR_EL1),
+-	RAZ_WI(SYS_ERXFR_EL1),
+-	RAZ_WI(SYS_ERXCTLR_EL1),
+-	RAZ_WI(SYS_ERXSTATUS_EL1),
+-	RAZ_WI(SYS_ERXADDR_EL1),
+-	RAZ_WI(SYS_ERXMISC0_EL1),
+-	RAZ_WI(SYS_ERXMISC1_EL1),
+-
+-	/* Performance Monitoring Registers are restricted. */
+-
+-	/* Limited Ordering Regions Registers are restricted. */
+-
+-	HOST_HANDLED(SYS_ICC_SGI1R_EL1),
+-	HOST_HANDLED(SYS_ICC_ASGI1R_EL1),
+-	HOST_HANDLED(SYS_ICC_SGI0R_EL1),
+-	{ SYS_DESC(SYS_ICC_SRE_EL1), .access = pvm_gic_read_sre, },
+-
+-	HOST_HANDLED(SYS_CCSIDR_EL1),
+-	HOST_HANDLED(SYS_CLIDR_EL1),
+-	HOST_HANDLED(SYS_CSSELR_EL1),
+-	HOST_HANDLED(SYS_CTR_EL0),
+-
+-	/* Performance Monitoring Registers are restricted. */
+-
+-	/* Activity Monitoring Registers are restricted. */
+-
+-	HOST_HANDLED(SYS_CNTP_TVAL_EL0),
+-	HOST_HANDLED(SYS_CNTP_CTL_EL0),
+-	HOST_HANDLED(SYS_CNTP_CVAL_EL0),
+-
+-	/* Performance Monitoring Registers are restricted. */
+ };
+ 
+ /*
+diff -Naur a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+--- a/arch/arm64/kvm/sys_regs.c	2024-05-26 04:35:50.000000000 -0400
++++ b/arch/arm64/kvm/sys_regs.c	2024-06-06 18:12:49.213735419 -0400
+@@ -3279,110 +3279,21 @@
+ 	return 1;
+ }
+ 
+-/**
+- * kvm_emulate_cp15_id_reg() - Handles an MRC trap on a guest CP15 access where
+- *			       CRn=0, which corresponds to the AArch32 feature
+- *			       registers.
+- * @vcpu: the vCPU pointer
+- * @params: the system register access parameters.
+- *
+- * Our cp15 system register tables do not enumerate the AArch32 feature
+- * registers. Conveniently, our AArch64 table does, and the AArch32 system
+- * register encoding can be trivially remapped into the AArch64 for the feature
+- * registers: Append op0=3, leaving op1, CRn, CRm, and op2 the same.
+- *
+- * According to DDI0487G.b G7.3.1, paragraph "Behavior of VMSAv8-32 32-bit
+- * System registers with (coproc=0b1111, CRn==c0)", read accesses from this
+- * range are either UNKNOWN or RES0. Rerouting remains architectural as we
+- * treat undefined registers in this range as RAZ.
+- */
+-static int kvm_emulate_cp15_id_reg(struct kvm_vcpu *vcpu,
+-				   struct sys_reg_params *params)
+-{
+-	int Rt = kvm_vcpu_sys_get_rt(vcpu);
+-
+-	/* Treat impossible writes to RO registers as UNDEFINED */
+-	if (params->is_write) {
+-		unhandled_cp_access(vcpu, params);
+-		return 1;
+-	}
+-
+-	params->Op0 = 3;
+-
+-	/*
+-	 * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
+-	 * Avoid conflicting with future expansion of AArch64 feature registers
+-	 * and simply treat them as RAZ here.
+-	 */
+-	if (params->CRm > 3)
+-		params->regval = 0;
+-	else if (!emulate_sys_reg(vcpu, params))
+-		return 1;
+-
+-	vcpu_set_reg(vcpu, Rt, params->regval);
+-	return 1;
+-}
+-
+-/**
+- * kvm_handle_cp_32 -- handles a mrc/mcr trap on a guest CP14/CP15 access
+- * @vcpu: The VCPU pointer
+- * @run:  The kvm_run struct
+- */
+-static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+-			    struct sys_reg_params *params,
+-			    const struct sys_reg_desc *global,
+-			    size_t nr_global)
+-{
+-	int Rt  = kvm_vcpu_sys_get_rt(vcpu);
+-
+-	params->regval = vcpu_get_reg(vcpu, Rt);
+-
+-	if (emulate_cp(vcpu, params, global, nr_global)) {
+-		if (!params->is_write)
+-			vcpu_set_reg(vcpu, Rt, params->regval);
+-		return 1;
+-	}
+ 
+-	unhandled_cp_access(vcpu, params);
+-	return 1;
+-}
+ 
+ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_handle_cp_64(vcpu, cp15_64_regs, ARRAY_SIZE(cp15_64_regs));
+ }
+ 
+-int kvm_handle_cp15_32(struct kvm_vcpu *vcpu)
+-{
+-	struct sys_reg_params params;
+-
+-	params = esr_cp1x_32_to_params(kvm_vcpu_get_esr(vcpu));
+ 
+-	/*
+-	 * Certain AArch32 ID registers are handled by rerouting to the AArch64
+-	 * system register table. Registers in the ID range where CRm=0 are
+-	 * excluded from this scheme as they do not trivially map into AArch64
+-	 * system register encodings.
+-	 */
+-	if (params.Op1 == 0 && params.CRn == 0 && params.CRm)
+-		return kvm_emulate_cp15_id_reg(vcpu, &params);
+-
+-	return kvm_handle_cp_32(vcpu, &params, cp15_regs, ARRAY_SIZE(cp15_regs));
+-}
+ 
+ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_handle_cp_64(vcpu, cp14_64_regs, ARRAY_SIZE(cp14_64_regs));
+ }
+ 
+-int kvm_handle_cp14_32(struct kvm_vcpu *vcpu)
+-{
+-	struct sys_reg_params params;
+ 
+-	params = esr_cp1x_32_to_params(kvm_vcpu_get_esr(vcpu));
+-
+-	return kvm_handle_cp_32(vcpu, &params, cp14_regs, ARRAY_SIZE(cp14_regs));
+-}
+ 
+ static bool is_imp_def_sys_reg(struct sys_reg_params *params)
+ {
+@@ -3938,9 +3849,7 @@
+ 
+ 	/* Make sure tables are unique and in order. */
+ 	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
+-	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
+ 	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
+-	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
+ 	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
+ 	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false);
+ 
+diff -Naur a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+--- a/drivers/perf/arm_pmuv3.c	2024-05-26 04:35:50.000000000 -0400
++++ b/drivers/perf/arm_pmuv3.c	2024-06-06 16:55:53.085742427 -0400
+@@ -1328,26 +1328,7 @@
+ 
+ PMUV3_INIT_SIMPLE(armv8_pmuv3)
+ 
+-PMUV3_INIT_SIMPLE(armv8_cortex_a34)
+-PMUV3_INIT_SIMPLE(armv8_cortex_a55)
+-PMUV3_INIT_SIMPLE(armv8_cortex_a65)
+-PMUV3_INIT_SIMPLE(armv8_cortex_a75)
+-PMUV3_INIT_SIMPLE(armv8_cortex_a76)
+-PMUV3_INIT_SIMPLE(armv8_cortex_a77)
+-PMUV3_INIT_SIMPLE(armv8_cortex_a78)
+-PMUV3_INIT_SIMPLE(armv9_cortex_a510)
+-PMUV3_INIT_SIMPLE(armv9_cortex_a520)
+-PMUV3_INIT_SIMPLE(armv9_cortex_a710)
+-PMUV3_INIT_SIMPLE(armv9_cortex_a715)
+-PMUV3_INIT_SIMPLE(armv9_cortex_a720)
+-PMUV3_INIT_SIMPLE(armv8_cortex_x1)
+-PMUV3_INIT_SIMPLE(armv9_cortex_x2)
+-PMUV3_INIT_SIMPLE(armv9_cortex_x3)
+-PMUV3_INIT_SIMPLE(armv9_cortex_x4)
+-PMUV3_INIT_SIMPLE(armv8_neoverse_e1)
+-PMUV3_INIT_SIMPLE(armv8_neoverse_n1)
+-PMUV3_INIT_SIMPLE(armv9_neoverse_n2)
+-PMUV3_INIT_SIMPLE(armv8_neoverse_v1)
++
+ 
+ PMUV3_INIT_SIMPLE(armv8_nvidia_carmel)
+ PMUV3_INIT_SIMPLE(armv8_nvidia_denver)
+@@ -1361,36 +1342,6 @@
+ PMUV3_INIT_MAP_EVENT(armv8_brcm_vulcan, armv8_vulcan_map_event)
+ 
+ static const struct of_device_id armv8_pmu_of_device_ids[] = {
+-	{.compatible = "arm,armv8-pmuv3",	.data = armv8_pmuv3_pmu_init},
+-	{.compatible = "arm,cortex-a34-pmu",	.data = armv8_cortex_a34_pmu_init},
+-	{.compatible = "arm,cortex-a35-pmu",	.data = armv8_cortex_a35_pmu_init},
+-	{.compatible = "arm,cortex-a53-pmu",	.data = armv8_cortex_a53_pmu_init},
+-	{.compatible = "arm,cortex-a55-pmu",	.data = armv8_cortex_a55_pmu_init},
+-	{.compatible = "arm,cortex-a57-pmu",	.data = armv8_cortex_a57_pmu_init},
+-	{.compatible = "arm,cortex-a65-pmu",	.data = armv8_cortex_a65_pmu_init},
+-	{.compatible = "arm,cortex-a72-pmu",	.data = armv8_cortex_a72_pmu_init},
+-	{.compatible = "arm,cortex-a73-pmu",	.data = armv8_cortex_a73_pmu_init},
+-	{.compatible = "arm,cortex-a75-pmu",	.data = armv8_cortex_a75_pmu_init},
+-	{.compatible = "arm,cortex-a76-pmu",	.data = armv8_cortex_a76_pmu_init},
+-	{.compatible = "arm,cortex-a77-pmu",	.data = armv8_cortex_a77_pmu_init},
+-	{.compatible = "arm,cortex-a78-pmu",	.data = armv8_cortex_a78_pmu_init},
+-	{.compatible = "arm,cortex-a510-pmu",	.data = armv9_cortex_a510_pmu_init},
+-	{.compatible = "arm,cortex-a520-pmu",	.data = armv9_cortex_a520_pmu_init},
+-	{.compatible = "arm,cortex-a710-pmu",	.data = armv9_cortex_a710_pmu_init},
+-	{.compatible = "arm,cortex-a715-pmu",	.data = armv9_cortex_a715_pmu_init},
+-	{.compatible = "arm,cortex-a720-pmu",	.data = armv9_cortex_a720_pmu_init},
+-	{.compatible = "arm,cortex-x1-pmu",	.data = armv8_cortex_x1_pmu_init},
+-	{.compatible = "arm,cortex-x2-pmu",	.data = armv9_cortex_x2_pmu_init},
+-	{.compatible = "arm,cortex-x3-pmu",	.data = armv9_cortex_x3_pmu_init},
+-	{.compatible = "arm,cortex-x4-pmu",	.data = armv9_cortex_x4_pmu_init},
+-	{.compatible = "arm,neoverse-e1-pmu",	.data = armv8_neoverse_e1_pmu_init},
+-	{.compatible = "arm,neoverse-n1-pmu",	.data = armv8_neoverse_n1_pmu_init},
+-	{.compatible = "arm,neoverse-n2-pmu",	.data = armv9_neoverse_n2_pmu_init},
+-	{.compatible = "arm,neoverse-v1-pmu",	.data = armv8_neoverse_v1_pmu_init},
+-	{.compatible = "cavium,thunder-pmu",	.data = armv8_cavium_thunder_pmu_init},
+-	{.compatible = "brcm,vulcan-pmu",	.data = armv8_brcm_vulcan_pmu_init},
+-	{.compatible = "nvidia,carmel-pmu",	.data = armv8_nvidia_carmel_pmu_init},
+-	{.compatible = "nvidia,denver-pmu",	.data = armv8_nvidia_denver_pmu_init},
+ 	{},
+ };
+ 
