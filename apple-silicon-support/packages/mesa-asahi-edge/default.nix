@@ -6,9 +6,14 @@
 }:
 
 (mesa.override {
-  galliumDrivers = [ "swrast" "asahi" ];
-  vulkanDrivers = [ "swrast" ];
+  galliumDrivers = [ "asahi" "virgl" "swrast" "kmsro" ];
+  vulkanDrivers = [ "swrast" "virtio" ];
+  vulkanLayers = [ "device-select" ];
+  eglPlatforms = [ "x11" "wayland" ];
+  withLibunwind = false;
+  withValgrind = false;
   enableGalliumNine = false;
+  enablePatentEncumberedCodecs = false;
   # libclc and other OpenCL components are needed for geometry shader support on Apple Silicon
   enableOpenCL = true;
 }).overrideAttrs (oldAttrs: {
@@ -38,6 +43,38 @@
       # do not want to add the dependencies
       "-Dlibunwind=disabled"
       "-Dlmsensors=disabled"
+      "-Dgallium-omx=disabled"
+      "-Dgallium-d3d12-video=disabled"
+      "-Dxlib-lease=disabled"
+      # add options from Fedora Asahi's meson flags we're missing
+      # some of these get picked up automatically since
+      # auto-features is enabled, but better to be explicit
+      # in the same places as Fedora is explicit
+      "-Dgallium-opencl=icd"
+      "-Dgallium-rusticl=true"
+      "-Ddri3=enabled"
+      "-Degl=enabled"
+      "-Dgbm=enabled"
+      "-Dopengl=true"
+      "-Dshared-glapi=enabled"
+      "-Dgles1=enabled"
+      "-Dgles2=enabled"
+      "-Dglx=dri"
+      "-Dglvnd=true"
+      # enable LLVM specifically (though auto-features seems to turn it on)
+      # and enable shared-LLVM specifically like Fedora Asahi does
+      # perhaps the lack of shared-llvm was/is breaking rusticl? needs investigation
+      "-Dllvm=enabled"
+      "-Dshared-llvm=enabled"
+      # add in additional options from mesa-asahi's meson options,
+      # mostly to make explicit what was once implicit (the Nix way!)
+      "-Degl-native-platform=wayland"
+      "-Dandroid-strict=false"
+      "-Dpower8=disabled"
+      "-Dvideo-codecs=vp9dec"
+      # save time, don't build tests
+      "-Dbuild-tests=false"
+      "-Denable-glcpp-tests=false"
     ];
 
   # replace patches with ones tweaked slightly to apply to this version
