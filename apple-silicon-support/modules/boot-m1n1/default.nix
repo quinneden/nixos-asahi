@@ -15,7 +15,7 @@ let
   bootFiles = {
     "m1n1/boot.bin" = pkgs.runCommand "boot.bin" {} ''
       cat ${bootM1n1}/build/m1n1.bin > $out
-      cat ${config.boot.kernelPackages.kernel}/dtbs/apple/*.dtb >> $out
+      cat ${config.boot.kernelPackages.kernel}/dtbs/apple/t8103*.dtb >> $out
       cat ${bootUBoot}/u-boot-nodtb.bin.gz >> $out
       if [ -n "${config.boot.m1n1ExtraOptions}" ]; then
         echo '${config.boot.m1n1ExtraOptions}' >> $out

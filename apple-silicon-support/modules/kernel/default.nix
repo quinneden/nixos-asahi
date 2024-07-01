@@ -71,7 +71,14 @@
       # is 1000) has the potential, though admittedly unlikely, risk of
       # UNBOUNDED data corruption in case of power loss!!!! Don't even think
       # about it on desktops!!
-      "nvme_apple.flush_interval=0"
+      # zzywysm says: now that tpwrules has scared you sufficiently, a reality check:
+      # 1) the data corruption is not unbounded, but you may lose data you wrote
+      # in the past couple of seconds
+      # 2) the default setting of 1000 drastically increases system performance
+      # compared to setting it to 0
+      # 3) if you want the performance increase on a desktop, then plug your Mac
+      # into a UPS
+      "nvme_apple.flush_interval=1000"
       # make boot mostly silent, not because we don't appreciate the useful
       # information (we do), but because spew slows down boot
       "quiet"

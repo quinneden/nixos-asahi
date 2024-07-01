@@ -22,6 +22,7 @@
   ];
   extraConfig = ''
     CONFIG_IDENT_STRING=" ${version}"
+    CONFIG_DEFAULT_DEVICE_TREE="t8103-j313"
     CONFIG_BOOTMETH_VBE=n
     CONFIG_AUTOBOOT_KEYED=n
     CONFIG_ARM64_SUPPORT_AARCH32=n
@@ -54,6 +55,6 @@
   preInstall = ''
     # compress so that m1n1 knows U-Boot's size and can find things after it
     gzip -n u-boot-nodtb.bin
-    cat ${m1n1}/build/m1n1.bin arch/arm/dts/t[68]*.dtb u-boot-nodtb.bin.gz > m1n1-u-boot.bin
+    cat ${m1n1}/build/m1n1.bin arch/arm/dts/t8103*.dtb u-boot-nodtb.bin.gz > m1n1-u-boot.bin
   '';
 })
