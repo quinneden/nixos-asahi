@@ -105,6 +105,9 @@ let
         { name = "pci-quirks";
           patch = ./patches-6.9/pci-quirks.patch;
         }
+        { name = "misc-quirks";
+          patch = ./patches-6.9/misc-quirks.patch;
+        }
         { name = "joeygouly-arm-hacks";
           patch = ./patches-6.9/joeygouly-arm-hacks.patch;
         }
