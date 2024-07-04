@@ -129,7 +129,7 @@ let
         { name = "no-unpriv-userns";
           patch = ./patches-6.9/0001-ZEN-Add-sysctl-and-CONFIG-to-disallow-unprivileged-C.patch;
           extraStructuredConfig = with lib.kernel; {
-            USER_NS_UNPRIVILEGED = no;
+            USER_NS_UNPRIVILEGED = yes;
           };
         }
       ] ++ _kernelPatches;

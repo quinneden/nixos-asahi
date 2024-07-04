@@ -45,7 +45,7 @@ index 459f44ef7..31bda44f4 100644
  
 +config USER_NS_UNPRIVILEGED
 +	bool "Allow unprivileged users to create namespaces"
-+	default n
++	default y
 +	depends on USER_NS
 +	help
 +	  When disabled, unprivileged users will not be able to create
