@@ -74,7 +74,8 @@
   hardware.enableAllFirmware = lib.mkForce true;
   hardware.enableRedistributableFirmware = lib.mkForce true;
   nixpkgs.config.allowUnfree = true;
-  sound.enable = false;
+  hardware.pulseaudio.enable = false;
+  hardware.asahi.setupAsahiSound = false;
   # avoid including non-reproducible dbus docs
   documentation.doc.enable = false;
   documentation.info.enable = lib.mkForce false;
