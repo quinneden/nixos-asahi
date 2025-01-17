@@ -16,6 +16,7 @@ jobs:
       - uses: tgymnich/fork-sync@v2.0
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
-          owner: zzywysm
+          owner: quinneden
+          repo: nixos-asahi
           base: supreme-asahi-6.12
           head: supreme-asahi-6.12
