@@ -1,0 +1,21 @@
+name: Sync with upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * 1,3,5'
+  workflow_dispatch:
+
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: "write"
+      contents: "read"
+    steps:
+      - uses: tgymnich/fork-sync@v2.0
+        with:
+          token: ${{ github.token }}
+          owner: zzywysm
+          base: supreme-asahi-6.12
+          head: supreme-asahi-6.12
